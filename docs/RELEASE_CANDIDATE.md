@@ -9,12 +9,10 @@
 
 ## Verification
 
-Pending final run in this cron build:
-
-- `npm test`
-- `npm run check`
-- `npm run smoke`
+- `npm test` - passed, 3 tests.
+- `npm run check` - passed, package metadata ok.
+- `npm run smoke` - passed, Markdown audit reported 16/16 checks passing for the good fixture.
 
 ## Classification
 
-Ship after verification passes and the release-candidate PR is opened.
+Ship.
