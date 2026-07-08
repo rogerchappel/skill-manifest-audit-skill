@@ -1,0 +1,11 @@
+{
+  "name": "good-skill-fixture",
+  "license": "MIT",
+  "bin": {
+    "good-skill": "bin/good.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node bin/good.js"
+  }
+}

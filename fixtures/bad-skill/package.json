@@ -1,0 +1,10 @@
+{
+  "name": "bad-skill-fixture",
+  "license": "MIT",
+  "bin": {
+    "bad-skill": "bin/bad.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
