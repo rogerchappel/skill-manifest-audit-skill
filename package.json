@@ -1,0 +1,31 @@
+{
+  "name": "skill-manifest-audit-skill",
+  "version": "0.1.0",
+  "description": "Read-only readiness audits for agent skill repositories.",
+  "type": "module",
+  "bin": {
+    "skill-manifest-audit": "bin/skill-manifest-audit.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/check-package.js",
+    "smoke": "node bin/skill-manifest-audit.js fixtures/good-skill --format markdown"
+  },
+  "keywords": [
+    "agent-skill",
+    "audit",
+    "readiness",
+    "cli"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "docs",
+    "lib",
+    "SKILL.md",
+    "README.md"
+  ]
+}
