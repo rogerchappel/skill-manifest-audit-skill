@@ -9,7 +9,9 @@
   "scripts": {
     "test": "node --test",
     "check": "node scripts/check-package.js",
-    "smoke": "node bin/skill-manifest-audit.js fixtures/good-skill --format markdown"
+    "smoke": "node bin/skill-manifest-audit.js fixtures/good-skill --format markdown",
+    "package:smoke": "npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "agent-skill",
@@ -27,5 +29,9 @@
     "lib",
     "SKILL.md",
     "README.md"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/skill-manifest-audit-skill.git"
+  }
 }
