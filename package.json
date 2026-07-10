@@ -28,7 +28,8 @@
     "docs",
     "lib",
     "SKILL.md",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
