@@ -29,10 +29,17 @@
     "lib",
     "SKILL.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rogerchappel/skill-manifest-audit-skill.git"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/skill-manifest-audit-skill/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/skill-manifest-audit-skill#readme"
 }
