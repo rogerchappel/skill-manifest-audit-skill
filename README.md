@@ -7,6 +7,15 @@ The CLI checks for the files and operational sections another agent needs before
 ## Quickstart
 
 ```bash
+npm install -g skill-manifest-audit-skill
+skill-manifest-audit --help
+skill-manifest-audit --version
+skill-manifest-audit . --format markdown
+```
+
+For local development:
+
+```bash
 npm test
 npm run check
 npm run smoke
