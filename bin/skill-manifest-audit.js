@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { auditSkillRepo, formatMarkdownReport } from '../lib/audit.js';
 
+const VERSION = '0.1.0';
+
 function parseArgs(argv) {
   const args = { repoPath: '.', format: 'json' };
   for (let index = 0; index < argv.length; index += 1) {
@@ -10,6 +12,8 @@ function parseArgs(argv) {
       index += 1;
     } else if (arg === '--help' || arg === '-h') {
       args.help = true;
+    } else if (arg === '--version' || arg === '-v') {
+      args.version = true;
     } else {
       args.repoPath = arg;
     }
@@ -20,9 +24,16 @@ function parseArgs(argv) {
 const args = parseArgs(process.argv.slice(2));
 
 if (args.help) {
-  console.log(`Usage: skill-manifest-audit [repo] [--format json|markdown]
+  console.log(`skill-manifest-audit ${VERSION}
+
+Usage: skill-manifest-audit [repo] [--format json|markdown]
 
 Runs a read-only audit for agent skill repository readiness.`);
+  process.exit(0);
+}
+
+if (args.version) {
+  console.log(VERSION);
   process.exit(0);
 }
 
