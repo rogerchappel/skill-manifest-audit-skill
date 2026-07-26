@@ -11,6 +11,7 @@ test('prints CLI help', async () => {
   assert.match(stdout, /skill-manifest-audit 0\.1\.0/u);
   assert.match(stdout, /Usage: skill-manifest-audit/u);
   assert.match(stdout, /read-only audit/u);
+  assert.match(stdout, /Exit codes: 0 ready, 1 readiness or repository input issues, 2 invalid usage/u);
 });
 
 test('prints CLI version', async () => {

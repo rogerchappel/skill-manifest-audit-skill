@@ -29,7 +29,13 @@ skill-manifest-audit <repo> --format json
 skill-manifest-audit <repo> --format markdown
 ```
 
-The command exits `0` when every check passes and `1` when readiness issues are found.
+The command exits `0` when every check passes, `1` when readiness issues are
+found, and `2` for unsupported CLI usage such as an unknown output format.
+
+Missing, unreadable, or non-file required paths and malformed `package.json`
+content are readiness issues. They are included as failing checks in both JSON
+and Markdown reports; the CLI does not print an exception stack for these
+repository input errors.
 
 ## Safety
 
