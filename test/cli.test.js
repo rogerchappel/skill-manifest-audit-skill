@@ -18,3 +18,15 @@ test('prints CLI version', async () => {
 
   assert.equal(stdout, '0.1.0\n');
 });
+
+test('prints malformed input failures without a stack trace', async () => {
+  await assert.rejects(
+    execFileAsync('node', ['bin/skill-manifest-audit.js', 'test/fixtures/malformed-package', '--format', 'json']),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /package\.json contains invalid JSON/u);
+      assert.doesNotMatch(error.stderr, /SyntaxError|at auditPackage/u);
+      return true;
+    }
+  );
+});
