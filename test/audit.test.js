@@ -46,6 +46,21 @@ test('reports malformed package.json as a structured failing check', (t) => {
   ));
 });
 
+test('reports non-object package.json as a structured failing check', (t) => {
+  const repoPath = temporaryRepo();
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(repoPath, 'package.json'), 'null');
+
+  const report = auditSkillRepo(repoPath);
+
+  assert.equal(report.summary.status, 'fail');
+  assert.ok(report.checks.some((check) =>
+    check.id === 'package:metadata'
+    && check.status === 'fail'
+    && check.evidence === 'package.json must contain a JSON object'
+  ));
+});
+
 test('reports directories at required file paths as structured failing checks', (t) => {
   const repoPath = temporaryRepo();
   t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
