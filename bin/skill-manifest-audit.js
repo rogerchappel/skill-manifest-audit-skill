@@ -28,7 +28,8 @@ if (args.help) {
 
 Usage: skill-manifest-audit [repo] [--format json|markdown]
 
-Runs a read-only audit for agent skill repository readiness.`);
+Runs a read-only audit for agent skill repository readiness.
+Exit codes: 0 ready, 1 readiness or repository input issues, 2 invalid usage.`);
   process.exit(0);
 }
 
