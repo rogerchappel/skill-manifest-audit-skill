@@ -5,23 +5,43 @@ const VERSION = '0.1.0';
 
 function parseArgs(argv) {
   const args = { repoPath: '.', format: 'json' };
+  let hasRepoPath = false;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--format') {
-      args.format = argv[index + 1] || 'json';
+      const value = argv[index + 1];
+      if (!value || value.startsWith('-')) {
+        throw new Error('Option --format requires a value.');
+      }
+      args.format = value;
       index += 1;
     } else if (arg === '--help' || arg === '-h') {
       args.help = true;
     } else if (arg === '--version' || arg === '-v') {
       args.version = true;
+    } else if (arg.startsWith('-')) {
+      throw new Error(`Unknown option: ${arg}`);
+    } else if (hasRepoPath) {
+      throw new Error('Only one repository path may be provided.');
     } else {
       args.repoPath = arg;
+      hasRepoPath = true;
     }
   }
   return args;
 }
 
-const args = parseArgs(process.argv.slice(2));
+function exitWithUsage(message) {
+  console.error(`${message}\nUsage: skill-manifest-audit [repo] [--format json|markdown]`);
+  process.exit(2);
+}
+
+let args;
+try {
+  args = parseArgs(process.argv.slice(2));
+} catch (error) {
+  exitWithUsage(error.message);
+}
 
 if (args.help) {
   console.log(`skill-manifest-audit ${VERSION}
@@ -45,8 +65,7 @@ if (args.format === 'markdown') {
 } else if (args.format === 'json') {
   console.log(JSON.stringify(report, null, 2));
 } else {
-  console.error(`Unsupported format: ${args.format}`);
-  process.exit(2);
+  exitWithUsage(`Unsupported format: ${args.format}`);
 }
 
 process.exit(report.summary.status === 'pass' ? 0 : 1);
