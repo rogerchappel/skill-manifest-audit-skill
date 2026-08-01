@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import { promisify } from 'node:util';
 
@@ -73,4 +76,31 @@ test('prints malformed input failures without a stack trace', async () => {
       return true;
     }
   );
+});
+
+test('exits 1 and identifies invalid package fields in JSON and Markdown reports', async (t) => {
+  const repoPath = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-manifest-audit-cli-'));
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  fs.cpSync('fixtures/good-skill', repoPath, { recursive: true });
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+  Object.assign(packageJson, {
+    name: ' ',
+    bin: { command: 7 },
+    scripts: { test: {}, smoke: false }
+  });
+  fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+  for (const format of ['json', 'markdown']) {
+    await assert.rejects(
+      execFileAsync('node', ['bin/skill-manifest-audit.js', repoPath, '--format', format]),
+      (error) => {
+        assert.equal(error.code, 1);
+        for (const field of ['name', 'bin', 'scripts.test', 'scripts.smoke']) {
+          assert.match(error.stdout, new RegExp(field.replace('.', '\\.')));
+        }
+        assert.equal(error.stderr, '');
+        return true;
+      }
+    );
+  }
 });

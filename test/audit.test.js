@@ -61,6 +61,64 @@ test('reports non-object package.json as a structured failing check', (t) => {
   ));
 });
 
+test('reports blank package fields as individual structured failing checks', (t) => {
+  const repoPath = temporaryRepo();
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+  Object.assign(packageJson, {
+    name: '   ',
+    bin: {},
+    scripts: { test: '\t', smoke: '' }
+  });
+  fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+  const report = auditSkillRepo(repoPath);
+
+  assert.equal(report.summary.status, 'fail');
+  for (const [id, evidence] of [
+    ['package:name', 'name'],
+    ['package:bin', 'bin'],
+    ['package:test', 'scripts.test'],
+    ['package:smoke', 'scripts.smoke']
+  ]) {
+    assert.ok(report.checks.some((check) =>
+      check.id === id && check.status === 'fail' && check.evidence === evidence
+    ));
+  }
+});
+
+test('rejects invalid package field container and value types', (t) => {
+  const cases = [
+    ['name', 42, 'package:name'],
+    ['bin', [], 'package:bin'],
+    ['bin', { command: ' ' }, 'package:bin'],
+    ['scripts', [], 'package:test'],
+    ['scripts', { test: true, smoke: ['node', 'smoke.js'] }, 'package:test']
+  ];
+
+  for (const [field, value, expectedId] of cases) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+    packageJson[field] = value;
+    fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+    const report = auditSkillRepo(repoPath);
+    assert.equal(report.summary.status, 'fail');
+    assert.ok(report.checks.some((check) => check.id === expectedId && check.status === 'fail'));
+  }
+});
+
+test('accepts a nonblank string bin target', (t) => {
+  const repoPath = temporaryRepo();
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+  packageJson.bin = 'bin/good.js';
+  fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+  assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
+});
+
 test('reports directories at required file paths as structured failing checks', (t) => {
   const repoPath = temporaryRepo();
   t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
