@@ -1,5 +1,6 @@
 {
   "name": "good-skill-fixture",
+  "version": "1.0.0",
   "license": "MIT",
   "bin": {
     "good-skill": "bin/good.js"
