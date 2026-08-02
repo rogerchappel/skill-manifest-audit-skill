@@ -104,3 +104,34 @@ test('exits 1 and identifies invalid package fields in JSON and Markdown reports
     );
   }
 });
+
+test('exits 1 and identifies fenced-only sections in JSON and Markdown reports', async (t) => {
+  const repoPath = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-manifest-audit-cli-'));
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  fs.cpSync('fixtures/good-skill', repoPath, { recursive: true });
+  fs.writeFileSync(path.join(repoPath, 'SKILL.md'), [
+    '# Demo',
+    '```markdown',
+    '## When to use',
+    '## Inputs',
+    '## Side-effect boundaries',
+    '## Approval requirements',
+    '## Examples',
+    '## Validation',
+    '```'
+  ].join('\n'));
+
+  for (const format of ['json', 'markdown']) {
+    await assert.rejects(
+      execFileAsync('node', ['bin/skill-manifest-audit.js', repoPath, '--format', format]),
+      (error) => {
+        assert.equal(error.code, 1);
+        for (const section of ['when to use', 'inputs', 'side-effect boundaries', 'approval requirements', 'examples', 'validation']) {
+          assert.match(error.stdout, new RegExp(`skill:${section}|includes "${section}"`, 'u'));
+        }
+        assert.equal(error.stderr, '');
+        return true;
+      }
+    );
+  }
+});

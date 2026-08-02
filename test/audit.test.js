@@ -17,6 +17,58 @@ test('passes a complete skill fixture', () => {
   assert.equal(report.summary.failed, 0);
 });
 
+test('ignores required section headings inside fenced code blocks', (t) => {
+  for (const fence of ['```markdown', '~~~markdown']) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const marker = fence.slice(0, 3);
+    const headings = [
+      '# Demo',
+      '',
+      fence,
+      '## When to use',
+      '## Inputs',
+      '## Side-effect boundaries',
+      '## Approval requirements',
+      '## Examples',
+      '## Validation',
+      marker
+    ];
+    fs.writeFileSync(path.join(repoPath, 'SKILL.md'), headings.join('\n'));
+
+    const report = auditSkillRepo(repoPath);
+
+    assert.equal(report.summary.status, 'fail');
+    assert.equal(report.summary.failed, 6);
+    assert.deepEqual(
+      report.checks.filter((check) => check.status === 'fail').map((check) => check.id),
+      [
+        'skill:when to use',
+        'skill:inputs',
+        'skill:side-effect boundaries',
+        'skill:approval requirements',
+        'skill:examples',
+        'skill:validation'
+      ]
+    );
+  }
+});
+
+test('recognizes supported ATX section headings outside fenced code', (t) => {
+  const repoPath = temporaryRepo();
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(repoPath, 'SKILL.md'), [
+    '# When to use',
+    '## Inputs',
+    '### Side-effect boundaries',
+    '#### Approval requirements',
+    '## Examples ##',
+    '### Validation details'
+  ].join('\n'));
+
+  assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
+});
+
 test('fails an incomplete skill fixture with actionable checks', () => {
   const report = auditSkillRepo('fixtures/bad-skill');
   assert.equal(report.summary.status, 'fail');
