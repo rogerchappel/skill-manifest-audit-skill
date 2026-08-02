@@ -171,6 +171,64 @@ test('accepts a nonblank string bin target', (t) => {
   assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
 });
 
+test('validates package version and license as publishable strings', (t) => {
+  const cases = [
+    ['version', undefined, 'package:version'],
+    ['version', ' ', 'package:version'],
+    ['version', '1.0', 'package:version'],
+    ['version', 'v1.0.0', 'package:version'],
+    ['license', {}, 'package:license'],
+    ['license', ' ', 'package:license']
+  ];
+
+  for (const [field, value, expectedId] of cases) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+    if (value === undefined) delete packageJson[field];
+    else packageJson[field] = value;
+    fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+    const report = auditSkillRepo(repoPath);
+    assert.equal(report.summary.status, 'fail');
+    assert.ok(report.checks.some((check) => check.id === expectedId && check.status === 'fail'));
+  }
+});
+
+test('requires every declared bin target to be a regular file', (t) => {
+  const cases = [
+    ['bin/missing.js', 'bin/missing.js is missing'],
+    ['bin', 'bin is not a regular file']
+  ];
+
+  for (const [target, evidence] of cases) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+    packageJson.bin = { good: 'bin/good.js', broken: target };
+    fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+    const report = auditSkillRepo(repoPath);
+    assert.ok(report.checks.some((check) =>
+      check.id === 'package:bin-files' && check.status === 'fail' && check.evidence === evidence
+    ));
+  }
+});
+
+test('accepts valid semver variants and string or command-map bin forms', (t) => {
+  for (const [version, bin] of [
+    ['1.2.3-beta.1+build.7', 'bin/good.js'],
+    ['0.0.0', { good: 'bin/good.js' }]
+  ]) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+    Object.assign(packageJson, { version, bin });
+    fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+    assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
+  }
+});
+
 test('reports directories at required file paths as structured failing checks', (t) => {
   const repoPath = temporaryRepo();
   t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
