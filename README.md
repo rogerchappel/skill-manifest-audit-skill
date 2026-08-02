@@ -36,11 +36,14 @@ are rejected with a concise usage message.
 
 Missing, unreadable, or non-file required paths and malformed `package.json`
 content are readiness issues. Package readiness requires a nonblank string
-`name`; a nonblank string `bin` target or a nonempty command map whose targets
-are nonblank strings; and nonblank string `scripts.test` and `scripts.smoke`
-commands. Invalid fields are included as individual failing checks in both JSON
-and Markdown reports; the CLI does not print an exception stack for these
-repository input errors.
+`name`; a SemVer-compatible `version`; a nonblank string `license`; a nonblank
+string `bin` target or a nonempty command map whose targets are nonblank
+strings; and nonblank string `scripts.test` and `scripts.smoke` commands. Every
+declared `bin` target must resolve to a regular file inside the audited package
+tree. Missing targets and directories are reported separately from malformed
+`bin` declarations. Invalid fields are included as individual failing checks in
+both JSON and Markdown reports; the CLI does not print an exception stack for
+these repository input errors.
 
 ## Safety
 

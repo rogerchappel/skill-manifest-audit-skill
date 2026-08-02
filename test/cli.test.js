@@ -85,6 +85,8 @@ test('exits 1 and identifies invalid package fields in JSON and Markdown reports
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
   Object.assign(packageJson, {
     name: ' ',
+    version: 'not-semver',
+    license: {},
     bin: { command: 7 },
     scripts: { test: {}, smoke: false }
   });
@@ -95,7 +97,7 @@ test('exits 1 and identifies invalid package fields in JSON and Markdown reports
       execFileAsync('node', ['bin/skill-manifest-audit.js', repoPath, '--format', format]),
       (error) => {
         assert.equal(error.code, 1);
-        for (const field of ['name', 'bin', 'scripts.test', 'scripts.smoke']) {
+        for (const field of ['name', 'version', 'license', 'bin', 'scripts.test', 'scripts.smoke']) {
           assert.match(error.stdout, new RegExp(field.replace('.', '\\.')));
         }
         assert.equal(error.stderr, '');
