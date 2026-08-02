@@ -51,6 +51,8 @@ repository input errors.
 
 ## Limitations
 
-- Markdown section detection is intentionally simple and requires explicit headings.
+- Markdown section detection requires explicit level 1–4 ATX headings. Headings
+  inside backtick or tilde fenced code blocks are treated as examples, not
+  operational sections.
 - The audit checks repository packaging readiness, not whether the skill advice is correct.
 - Future fixer modes should remain opt-in and dry-run first.
