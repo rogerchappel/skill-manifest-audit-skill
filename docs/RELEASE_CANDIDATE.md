@@ -9,9 +9,17 @@
 
 ## Verification
 
-- `npm test` - passed, 3 tests.
+- `npm test` - passed; use the command output as the source of truth for the current test count.
 - `npm run check` - passed, package metadata ok.
-- `npm run smoke` - passed, Markdown audit reported 16/16 checks passing for the good fixture.
+- `npm run smoke` - passed; use the report summary as the source of truth for the current check count.
+- `npm run package:consumer` - creates the npm tarball, verifies its runtime files,
+  installs it in a disposable consumer project, and exercises the installed
+  CLI help, version, JSON audit, and Markdown audit.
+- `npm run release:check` - runs all release verification above, including the
+  disposable package consumer test.
+
+The package is not yet available from the npm registry. The README therefore
+uses the GitHub repository as the supported install source until publication.
 
 ## Classification
 

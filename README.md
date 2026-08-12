@@ -7,11 +7,15 @@ The CLI checks for the files and operational sections another agent needs before
 ## Quickstart
 
 ```bash
-npm install -g skill-manifest-audit-skill
+npm install -g git+https://github.com/rogerchappel/skill-manifest-audit-skill.git
 skill-manifest-audit --help
 skill-manifest-audit --version
 skill-manifest-audit . --format markdown
 ```
+
+The package is not yet published to the npm registry. Until the first registry
+release is available, the GitHub repository above is the supported install
+source.
 
 For local development:
 
@@ -19,6 +23,7 @@ For local development:
 npm test
 npm run check
 npm run smoke
+npm run package:consumer
 node bin/skill-manifest-audit.js . --format markdown
 ```
 
