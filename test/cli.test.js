@@ -33,12 +33,41 @@ test('prints CLI version', async () => {
   assert.equal(stdout, '0.1.0\n');
 });
 
+test('accepts the short help and version aliases as standalone invocations', async () => {
+  const help = await execFileAsync('node', ['bin/skill-manifest-audit.js', '-h']);
+  const version = await execFileAsync('node', ['bin/skill-manifest-audit.js', '-v']);
+
+  assert.match(help.stdout, /Usage: skill-manifest-audit/u);
+  assert.equal(version.stdout, '0.1.0\n');
+});
+
+test('rejects help and version when combined with any other argument', async () => {
+  for (const args of [
+    ['fixtures/good-skill', '--help'],
+    ['-h', '--format', 'json'],
+    ['--version', 'fixtures/good-skill'],
+    ['--format', 'markdown', '-v'],
+    ['--help', '--version']
+  ]) {
+    await assertUsageError(args, /Options --help\/-h and --version\/-v must be used alone/u);
+  }
+});
+
 test('rejects unknown options with a usage error', async () => {
   await assertUsageError(['fixtures/good-skill', '--bogus'], /Unknown option: --bogus/u);
 });
 
 test('rejects a missing --format value with a usage error', async () => {
   await assertUsageError(['fixtures/good-skill', '--format'], /Option --format requires a value/u);
+});
+
+test('rejects repeated --format options regardless of ordering', async () => {
+  for (const args of [
+    ['--format', 'json', '--format', 'markdown', 'fixtures/good-skill'],
+    ['fixtures/good-skill', '--format', 'markdown', '--format', 'json']
+  ]) {
+    await assertUsageError(args, /Option --format may only be provided once/u);
+  }
 });
 
 test('rejects more than one repository path with a usage error', async () => {

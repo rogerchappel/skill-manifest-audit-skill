@@ -6,14 +6,25 @@ const VERSION = '0.1.0';
 function parseArgs(argv) {
   const args = { repoPath: '.', format: 'json' };
   let hasRepoPath = false;
+  let hasFormat = false;
+  const hasStandaloneOption = argv.some((arg) =>
+    ['--help', '-h', '--version', '-v'].includes(arg)
+  );
+  if (hasStandaloneOption && argv.length !== 1) {
+    throw new Error('Options --help/-h and --version/-v must be used alone.');
+  }
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--format') {
+      if (hasFormat) {
+        throw new Error('Option --format may only be provided once.');
+      }
       const value = argv[index + 1];
       if (!value || value.startsWith('-')) {
         throw new Error('Option --format requires a value.');
       }
       args.format = value;
+      hasFormat = true;
       index += 1;
     } else if (arg === '--help' || arg === '-h') {
       args.help = true;

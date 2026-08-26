@@ -36,8 +36,10 @@ skill-manifest-audit <repo> --format markdown
 
 The command exits `0` when every check passes, `1` when readiness issues are
 found, and `2` for unsupported CLI usage. Unknown options, a missing
-`--format` value, unsupported output formats, and multiple repository paths
-are rejected with a concise usage message.
+`--format` value, a repeated `--format` option, unsupported output formats,
+and multiple repository paths are rejected with a concise usage message.
+`--help`/`-h` and `--version`/`-v` are standalone invocations and cannot be
+combined with a repository path, a format option, or each other.
 
 Missing, unreadable, or non-file required paths and malformed `package.json`
 content are readiness issues. Package readiness requires a nonblank string
