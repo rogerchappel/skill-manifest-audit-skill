@@ -61,8 +61,9 @@ these repository input errors.
 
 ## Limitations
 
-- Markdown section detection requires explicit level 1–4 ATX headings. Headings
-  inside backtick or tilde fenced code blocks are treated as examples, not
-  operational sections.
+- Markdown section detection requires explicit level 1–4 ATX headings with zero
+  to three leading spaces. Four-space-indented text is a code block, not a
+  heading. Headings inside backtick or tilde fenced code blocks are treated as
+  examples, not operational sections.
 - The audit checks repository packaging readiness, not whether the skill advice is correct.
 - Future fixer modes should remain opt-in and dry-run first.
