@@ -69,6 +69,32 @@ test('recognizes supported ATX section headings outside fenced code', (t) => {
   assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
 });
 
+test('recognizes ATX section headings indented by up to three spaces', (t) => {
+  for (const indentation of [' ', '  ', '   ']) {
+    const repoPath = temporaryRepo();
+    t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+    const skill = fs.readFileSync(path.join(repoPath, 'SKILL.md'), 'utf8');
+    fs.writeFileSync(
+      path.join(repoPath, 'SKILL.md'),
+      skill.replace(/^#{1,4}\s/gmu, (heading) => `${indentation}${heading}`)
+    );
+
+    assert.equal(auditSkillRepo(repoPath).summary.status, 'pass');
+  }
+});
+
+test('does not treat four-space-indented ATX text as section headings', (t) => {
+  const repoPath = temporaryRepo();
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  const skill = fs.readFileSync(path.join(repoPath, 'SKILL.md'), 'utf8');
+  fs.writeFileSync(
+    path.join(repoPath, 'SKILL.md'),
+    skill.replace(/^#{1,4}\s/gmu, (heading) => `    ${heading}`)
+  );
+
+  assert.equal(auditSkillRepo(repoPath).summary.failed, 6);
+});
+
 test('fails an incomplete skill fixture with actionable checks', () => {
   const report = auditSkillRepo('fixtures/bad-skill');
   assert.equal(report.summary.status, 'fail');
