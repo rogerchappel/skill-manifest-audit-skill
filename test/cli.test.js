@@ -166,3 +166,25 @@ test('exits 1 and identifies fenced-only sections in JSON and Markdown reports',
     );
   }
 });
+
+test('accepts three-space-indented ATX headings and rejects four-space indentation', async (t) => {
+  const repoPath = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-manifest-audit-cli-'));
+  t.after(() => fs.rmSync(repoPath, { recursive: true, force: true }));
+  fs.cpSync('fixtures/good-skill', repoPath, { recursive: true });
+  const skillPath = path.join(repoPath, 'SKILL.md');
+  const skill = fs.readFileSync(skillPath, 'utf8');
+
+  fs.writeFileSync(skillPath, skill.replace(/^#{1,4}\s/gmu, (heading) => `   ${heading}`));
+  const accepted = await execFileAsync('node', ['bin/skill-manifest-audit.js', repoPath, '--format', 'json']);
+  assert.equal(JSON.parse(accepted.stdout).summary.status, 'pass');
+
+  fs.writeFileSync(skillPath, skill.replace(/^#{1,4}\s/gmu, (heading) => `    ${heading}`));
+  await assert.rejects(
+    execFileAsync('node', ['bin/skill-manifest-audit.js', repoPath, '--format', 'json']),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.equal(JSON.parse(error.stdout).summary.failed, 6);
+      return true;
+    }
+  );
+});
