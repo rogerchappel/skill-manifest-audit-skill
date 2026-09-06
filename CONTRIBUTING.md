@@ -4,12 +4,15 @@ Thanks for helping improve `skill-manifest-audit-skill`.
 
 ## Development
 
+Use a supported Node.js release. CI runs the complete release check on Node 20,
+the minimum declared runtime, and Node 24, the current runtime line.
+
 ```sh
-npm test
-npm run check
-npm run smoke
-npm run package:smoke
+npm run release:check
 ```
+
+That command includes the package check, full test suite, CLI smoke test, npm
+pack dry-run, and installed-consumer verification.
 
 Keep the audit read-only. New checks should explain the missing evidence without modifying the inspected repository.
 
