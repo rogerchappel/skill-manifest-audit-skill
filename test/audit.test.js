@@ -278,3 +278,24 @@ test('reports directories at required file paths as structured failing checks', 
     && check.evidence === 'SKILL.md is not a regular file'
   ));
 });
+
+
+test('rejects bin targets outside the repository while accepting an in-repository target', (t) => {
+  const repoPath = temporaryRepo();
+  const outsidePath = path.join(path.dirname(repoPath), `${path.basename(repoPath)}-outside.js`);
+  t.after(() => {
+    fs.rmSync(repoPath, { recursive: true, force: true });
+    fs.rmSync(outsidePath, { force: true });
+  });
+  fs.writeFileSync(outsidePath, 'export {};\n');
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+  packageJson.bin = { good: 'bin/good.js', outside: `../${path.basename(outsidePath)}` };
+  fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+  const report = auditSkillRepo(repoPath);
+  assert.ok(report.checks.some((check) =>
+    check.id === 'package:bin-files'
+    && check.status === 'fail'
+    && check.evidence === `../${path.basename(outsidePath)} resolves outside the repository`
+  ));
+});
