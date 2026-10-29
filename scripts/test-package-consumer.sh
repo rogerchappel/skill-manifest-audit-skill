@@ -32,4 +32,15 @@ test "$("$cli" --version)" = '0.1.0'
 "$cli" fixture --format json | grep -Fq '"status": "pass"'
 "$cli" fixture --format markdown | grep -Fq 'Status: **pass**'
 
-echo 'packaged CLI consumer test passed'
+node --input-type=module <<'EOF'
+import assert from 'node:assert/strict';
+import { auditSkillRepo, formatMarkdownReport } from 'skill-manifest-audit-skill';
+
+assert.equal(typeof auditSkillRepo, 'function');
+assert.equal(typeof formatMarkdownReport, 'function');
+const report = auditSkillRepo('fixture');
+assert.equal(report.summary.status, 'pass');
+assert.match(formatMarkdownReport(report), /Status: \*\*pass\*\*/);
+EOF
+
+echo 'packaged CLI and root-import consumer test passed'
