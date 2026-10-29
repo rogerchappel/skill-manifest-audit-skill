@@ -42,5 +42,8 @@
   "bugs": {
     "url": "https://github.com/rogerchappel/skill-manifest-audit-skill/issues"
   },
-  "homepage": "https://github.com/rogerchappel/skill-manifest-audit-skill#readme"
+  "homepage": "https://github.com/rogerchappel/skill-manifest-audit-skill#readme",
+  "exports": {
+    ".": "./lib/audit.js"
+  }
 }
