@@ -19,6 +19,9 @@ source.
 
 For local development:
 
+Node.js 20 or newer is supported. CI verifies the release checks on Node.js 20
+and 24; the package engine requirement is `>=20`.
+
 ```bash
 npm test
 npm run check
