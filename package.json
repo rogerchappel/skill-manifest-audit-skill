@@ -28,6 +28,7 @@
     "bin",
     "docs",
     "lib",
+    "test",
     "SKILL.md",
     "README.md",
     "LICENSE",
