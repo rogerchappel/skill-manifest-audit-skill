@@ -15,6 +15,7 @@ tarball="$package_dir/$tarball_name"
 for runtime_file in \
   package/bin/skill-manifest-audit.js \
   package/lib/audit.js \
+  package/package.json \
   package/SKILL.md \
   package/README.md \
   package/LICENSE; do
@@ -35,6 +36,10 @@ test "$("$cli" --version)" = '0.1.0'
 node --input-type=module <<'EOF'
 import assert from 'node:assert/strict';
 import { auditSkillRepo, formatMarkdownReport } from 'skill-manifest-audit-skill';
+import metadata from 'skill-manifest-audit-skill/package.json' with { type: 'json' };
+
+assert.equal(metadata.name, 'skill-manifest-audit-skill');
+assert.equal(metadata.version, '0.1.0');
 
 assert.equal(typeof auditSkillRepo, 'function');
 assert.equal(typeof formatMarkdownReport, 'function');

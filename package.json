@@ -28,6 +28,7 @@
     "bin",
     "docs",
     "lib",
+    "package.json",
     "test",
     "SKILL.md",
     "README.md",
@@ -45,6 +46,7 @@
   },
   "homepage": "https://github.com/rogerchappel/skill-manifest-audit-skill#readme",
   "exports": {
-    ".": "./lib/audit.js"
+    ".": "./lib/audit.js",
+    "./package.json": "./package.json"
   }
 }
