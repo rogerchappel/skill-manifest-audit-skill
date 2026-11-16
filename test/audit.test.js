@@ -241,6 +241,25 @@ test('requires every declared bin target to be a regular file', (t) => {
   }
 });
 
+test('rejects bin symlinks that resolve outside the repository', (t) => {
+  const repoPath = temporaryRepo();
+  const outsidePath = path.join(path.dirname(repoPath), `${path.basename(repoPath)}-outside.js`);
+  t.after(() => {
+    fs.rmSync(repoPath, { recursive: true, force: true });
+    fs.rmSync(outsidePath, { force: true });
+  });
+  fs.writeFileSync(outsidePath, 'export {};\n');
+  fs.symlinkSync(outsidePath, path.join(repoPath, 'bin/escape.js'));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json'), 'utf8'));
+  packageJson.bin = { good: 'bin/good.js', escape: 'bin/escape.js' };
+  fs.writeFileSync(path.join(repoPath, 'package.json'), JSON.stringify(packageJson));
+
+  const report = auditSkillRepo(repoPath);
+  assert.ok(report.checks.some((check) =>
+    check.id === 'package:bin-files' && check.status === 'fail'
+  ));
+});
+
 test('accepts valid semver variants and string or command-map bin forms', (t) => {
   for (const [version, bin] of [
     ['1.2.3-beta.1+build.7', 'bin/good.js'],
