@@ -25,5 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install dependencies from lockfile
+        run: npm ci
+
       - name: Run release checks
         run: npm run release:check
